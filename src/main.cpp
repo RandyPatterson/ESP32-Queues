@@ -23,6 +23,7 @@ void display( void * pvParameters )
 {
     int element;
     while(true){
+        //remove item from queue,  will block until an item is available
         xQueueReceive(queue, &element, portMAX_DELAY);
         tft.fillRect(0,0,tft.width(),30,TFT_BLACK);
         tft.drawString(String(element),0,0);
@@ -37,6 +38,7 @@ void display( void * pvParameters )
 void setup()
 {
     Serial.begin(115200);
+    //create a queue that will hold up to 10 integers
     queue = xQueueCreate( 10, sizeof( int ) );
 
 
@@ -47,12 +49,9 @@ void setup()
     tft.setTextColor(TFT_WHITE);
     tft.setCursor(0, 0);
     tft.setTextDatum(TL_DATUM);
-    //tft.drawString("Starting",  tft.width() / 2, tft.height() / 2);
     //turn on backlight
-    if (TFT_BL > 0) {
-        pinMode(TFT_BL, OUTPUT);
-        digitalWrite(TFT_BL, HIGH);
-    }
+    pinMode(TFT_BL, OUTPUT);
+    digitalWrite(TFT_BL, HIGH);
 
 
     
@@ -75,6 +74,7 @@ void loop()
 {
     while(true) {
         counter++;
+        //add data to queue.  When full will block until a slot is available
         xQueueSend(queue, &counter, portMAX_DELAY);
         Serial.println(counter);
         delay(200);
